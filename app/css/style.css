@@ -1,0 +1,16 @@
+#hidemobile {
+    visibility: hidden;
+}
+
+/* tablet or bigger */
+@media (min-width: 550px) {
+    #hidemobile {
+        visibility: visible;
+    }   
+}
+
+
+.nav.ui-block-b {
+    text-align: right;
+}
+
