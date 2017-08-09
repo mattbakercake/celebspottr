@@ -11,8 +11,13 @@ require.config({
         backbone: 'js/vendor/backbone1.3.3-min',
         text: 'js/vendor/text',
         handlebars: 'js/vendor/handlebars',
-        router: 'js/router'
-    }
+        router: 'js/router',
+        bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'
+    },
+    shim: {
+        /* Set bootstrap dependencies (just jQuery) */
+        'bootstrap' : ['jquery']
+     }
 });
 
 //fire up router to start app

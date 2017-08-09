@@ -1,16 +1,12 @@
-#hidemobile {
-    visibility: hidden;
-}
+.dz-message {
+    background: #eee;
+    color: #000;
+    padding: 20px 0;
+    text-align: center;
+  }
 
-/* tablet or bigger */
-@media (min-width: 550px) {
-    #hidemobile {
-        visibility: visible;
-    }   
-}
+  .dz-message:hover {
+  	background: #ccc;
+  }
 
-
-.nav.ui-block-b {
-    text-align: right;
-}
 
