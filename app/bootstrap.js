@@ -12,7 +12,10 @@ require.config({
         text: 'js/vendor/text',
         handlebars: 'js/vendor/handlebars',
         router: 'js/router',
-        bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'
+        bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+        sha256: 'js/vendor/sha256',
+        hmacsha256: 'js/vendor/hmac-sha256',
+        cryptosha256: 'js/vendor/cryptosha256'
     },
     shim: {
         /* Set bootstrap dependencies (just jQuery) */

@@ -6,8 +6,9 @@ define([
     'underscore',
     'backbone',
     'handlebars',
+    'js/collections/PeopleCollection',
     'text!templates/indextemplate.html',
-], function($, _, Backbone, Handlebars, indexTemplate) {
+], function($, _, Backbone, Handlebars, PeopleCollection, indexTemplate) {
     
     //Index View
     var IndexView = Backbone.View.extend({
@@ -48,6 +49,9 @@ define([
             //have read file and have image blob
             reader.onload = function(event) { 
                 console.log(event.target.result);
+
+                var people = new PeopleCollection();
+                console.log(people.fetch());
             };
         }
 
