@@ -15,7 +15,7 @@ require.config({
         bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
         sha256: 'js/vendor/sha256',
         hmacsha256: 'js/vendor/hmac-sha256',
-        cryptosha256: 'js/vendor/cryptosha256'
+        cryptosha256: 'js/vendor/cryptosha256',
     },
     shim: {
         /* Set bootstrap dependencies (just jQuery) */
@@ -23,9 +23,10 @@ require.config({
      }
 });
 
-//fire up router to start app
-require(['router'], function(Router) { 
-    Router.initialize();        
-});
 
+require(['./application-config'], function(){ //globally include config file
+    require(['router'], function(Router) { //fire up router to start app
+        Router.initialize();        
+    });
+});
 
