@@ -10,7 +10,6 @@ define([
     'text!templates/indextemplate.html',
 ], function($, _, Backbone, Handlebars, PeopleCollection, indexTemplate) {
     
-    //Index View
     var IndexView = Backbone.View.extend({
 
         el: '#app-content', //DOM element to attach view to
@@ -48,10 +47,13 @@ define([
 
             //have read file and have image blob
             reader.onload = function(event) { 
-                console.log(event.target.result);
+
+                var imageBlob = event.target.result.split(',')[1] //image binary meta data removed
 
                 var people = new PeopleCollection();
-                console.log(people.fetch());
+                people.fetch({
+                    data: JSON.stringify({ Image : { Bytes: imageBlob }})
+                });
             };
         }
 
