@@ -7,9 +7,9 @@ define([
     var Person = Backbone.Model.extend({
     	
     	defaults: {
-    		id: null,
+    		Id: null,
 			MatchConfidence: null,
-			name: null
+			Name: null
 		}
 
     });
