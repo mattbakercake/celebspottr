@@ -19,6 +19,7 @@
 					Select a photo
 				</div>
 				<div class="panel-body">
+					<canvas id="image-canvas" class="col-md-12"></canvas>
 					Hello {{name}} this is a compiled template!
 
 					<input type="file" id="file" name="file" accept=".jpg,.jpeg,.png"/>
@@ -35,7 +36,19 @@
 					
 				</div>
 				<div class="panel-body">
-					
+					{{#each people}}
+						<div>
+							<ul>
+								<li>
+									{{#if this.attributes.Name}}
+										Name : {{this.attributes.Name}}
+									{{else}}
+										Unrecognised Person
+									{{/if}}
+								</li>
+							</ul>
+						</div>
+					{{/each}}
 				</div>
 			</div>
 		</div>
