@@ -1,4 +1,4 @@
-<div class="container-fluid">
+
 
 	<!-- Title Row-->
 	<div class="row">
@@ -13,12 +13,12 @@
 
 	<div class="row">
 		<!-- Photo panel-->
-		<div class="col-md-9">
+		<div class="col-md-7">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					Select a photo
+					Image Selection
 				</div>
-				<div class="panel-body">
+				<div id="photoPanel" class="panel-body">
 					<canvas id="image-canvas"></canvas>
 
 					<input type="file" id="file" name="file" accept=".jpg,.jpeg,.png" data-toggle="popover" title="Get Started" data-content="Choose a jpeg/png image containing celebrity faces" data-placement="top"/>
@@ -27,10 +27,10 @@
 		</div>
 
 		<!-- Side panel-->
-		<div class="col-md-3">
+		<div class="col-md-5">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					
+					Analysis Result
 				</div>
 				<div class="panel-body">
 					<ul class="list-group">
@@ -39,9 +39,9 @@
 							<input type="checkbox" data-id="{{this.cid}}" checked>
 							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 							{{#if this.attributes.Name}}
-								<a href="http://{{this.attributes.Urls}}" target="_blank">{{this.attributes.Name}}</a> (Confidence: {{this.attributes.MatchConfidence}}%)
+								<a href="http://{{this.attributes.Urls}}" class="btn btn-default {{#unless this.attributes.Urls}}disabled{{/unless}}" target="_blank">{{this.attributes.Name}} (Confidence: {{this.attributes.MatchConfidence}}%)</a>
 							{{else}}
-								Unrecognised Person
+								<span class="btn btn-default disabled">Unrecognised Person</span>
 							{{/if}}
 						</li>	
 					{{/each}}
@@ -50,6 +50,4 @@
 			</div>
 		</div>
 	</div>
-    
-</div>
 

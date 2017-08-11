@@ -77,6 +77,7 @@ define([
                 this.add(person);
              },this));
 
+             this.trigger('fetchComplete')
         },
 
         /**

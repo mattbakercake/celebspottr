@@ -31,7 +31,7 @@ define([
 
 
         events: {
-            'click input' : 'closePopover', //file button clicked
+            'click #file' : 'closePopover',
             'change #file' : 'readFile', //file chosen
             'click [type="checkbox"]' : 'redrawBoundingBoxes' //checkbox changed
         },
@@ -42,6 +42,14 @@ define([
          */
         initialize: function() {
             this.render();
+
+            this.listenToOnce(this,'renderFinished',function(){ //close intro popover when file selected
+                $('#file').popover('show');
+            });
+
+            $(window).on("resize", $.proxy(function() { //resize canvas if window resized
+                this.renderImage();
+            },this)) 
         },
   
 
@@ -61,9 +69,10 @@ define([
 
             this.renderImage();
 
-            this.hideLoading(); //hide loading screen if visible;
+            this.hideLoading(); //hide loading screen if visible
 
-            $('#file').popover('show');
+            this.trigger('renderFinished')
+
         },
 
 
@@ -99,7 +108,7 @@ define([
             this.people = new PeopleCollection();
 
             //listen for collection update after API call to re-render page
-            this.listenTo(this.people, "update", this.render);
+            this.listenTo(this.people, "fetchComplete", this.render);
 
             //fetch collection (calls API)
             this.people.fetch({
@@ -113,33 +122,34 @@ define([
          */
          renderImage: function() {
 
-            //create an image object from the data
-            var img = new Image();
-            img.src = this.imageURI;
+            if (this.imageURI !== null) {
+                //create an image object from the data
+                var img = new Image();
+                img.src = this.imageURI;
 
-            //initialise canvas element
-            var canvas = document.getElementById('image-canvas');
-            var ctx = canvas.getContext('2d');
-            
-            //when image data loaded scale the image
-            img.onload = $.proxy(function() {
-                var ratio = img.width / img.height;
-                this.imgWidth = img.width > canvas.width ? canvas.width : img.width;
-                this.imgHeight = this.imgWidth / ratio;
-                if (this.imgHeight > canvas.height) {
-                     this.imgHeight = canvas.height;
-                     this.imgWidth = this.imgHeight * ratio;
-                 }
-                
-                ctx.drawImage(img,0,0, this.imgWidth , this.imgHeight); //draw image to canvas
+                //initialise canvas element
+                var canvas = document.getElementById('image-canvas');
+                var ctx = canvas.getContext('2d');
+                canvas.width = $('#photoPanel').width();
 
-                this.scaledCanvasImg = ctx.getImageData(0,0,canvas.width,canvas.height); //save canvas image data to reset later
+                //when image data loaded scale the image
+                img.onload = $.proxy(function() {
+                    var ratio = img.width / img.height;
+                    this.imgWidth = (img.width > canvas.width) ? canvas.width : img.width;
+                    this.imgHeight = this.imgWidth / ratio;
 
-                $.each(this.people.models, $.proxy(function(index,person){ //for each person draw bounding box around face
-                    this.drawImageBoundingBox(person);
-                },this));
-                
-            },this);
+                    canvas.width = this.imgWidth;
+                    canvas.height = this.imgHeight;
+                    ctx.drawImage(img,0,0, this.imgWidth , this.imgHeight); //draw image to canvas
+
+                    this.scaledCanvasImg = ctx.getImageData(0,0,canvas.width,canvas.height); //save canvas image data to reset later
+
+                    $.each(this.people.models, $.proxy(function(index,person){ //for each person draw bounding box around face
+                        this.drawImageBoundingBox(person);
+                    },this));
+                    
+                },this);
+            }
 
          },
 
@@ -149,25 +159,29 @@ define([
         */
         drawImageBoundingBox: function(person) {
 
-            if (person.get('Name') !== null) {
-                var params = person.get('Face').BoundingBox; //celebrity
-            } else {
-                var params = person.get('BoundingBox'); //unrecognised
+            if ($('[type="checkbox"][data-id="'+ person.cid +'"]').is(':checked')) { //if person's checkbox selected
+                if (person.get('Name') !== null) {
+                    var params = person.get('Face').BoundingBox; //celebrity
+                } else {
+                    var params = person.get('BoundingBox'); //unrecognised
+                }
+                var colour = person.get('highlightColour')
+
+                //calculate box coordinates from API data and scaled image size
+                var left = params.Left * this.imgWidth;
+                var top = params.Top * this.imgHeight;
+                var height = params.Height * this.imgHeight;
+                var width = params.Width * this.imgWidth;
+
+                //draw the box
+                var canvas = document.getElementById('image-canvas');
+                var ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.rect(left, top, width, height);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = colour;
+                ctx.stroke();
             }
-            var colour = person.get('highlightColour')
-
-            var left = params.Left * this.imgWidth;
-            var top = params.Top * this.imgHeight;
-            var height = params.Height * this.imgHeight;
-            var width = params.Width * this.imgWidth;
-
-            var canvas = document.getElementById('image-canvas');
-            var ctx = canvas.getContext('2d');
-            ctx.beginPath();
-            ctx.rect(left, top, width, height);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = colour;
-            ctx.stroke();
         },
 
         /**
@@ -182,10 +196,8 @@ define([
 
             //draw boudning box for each person who is selected
             $.each($('[type="checkbox"]'), $.proxy(function(index,checkbox) {
-                if ($(checkbox).is(':checked')) {
-                    var person = this.people.get({cid:$(checkbox).data('id')});
-                    this.drawImageBoundingBox(person);
-                } 
+                var person = this.people.get({cid:$(checkbox).data('id')});
+                this.drawImageBoundingBox(person);
             },this));
 
         },
@@ -195,7 +207,7 @@ define([
          *  Close get started popover
          */
         closePopover: function() {
-            $('#file').popover('close')
+            $('#file').popover('hide')
         },
 
 
