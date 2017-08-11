@@ -19,12 +19,9 @@
 					Select a photo
 				</div>
 				<div class="panel-body">
-					<canvas id="image-canvas" class="col-md-12"></canvas>
-					Hello {{name}} this is a compiled template!
+					<canvas id="image-canvas"></canvas>
 
 					<input type="file" id="file" name="file" accept=".jpg,.jpeg,.png"/>
-					<output id="list"></output>
-
 				</div>
 			</div>
 		</div>
@@ -36,19 +33,18 @@
 					
 				</div>
 				<div class="panel-body">
+					<ul class="list-group">
 					{{#each people}}
-						<div>
-							<ul>
-								<li>
-									{{#if this.attributes.Name}}
-										Name : {{this.attributes.Name}}
-									{{else}}
-										Unrecognised Person
-									{{/if}}
-								</li>
-							</ul>
-						</div>
+						<li class="list-group-item {{#if this.attributes.Name}}celebrity{{/if}}" data-id="{{this.attributes.Id}}" style="background-color: {{this.attributes.highlightColour}}">
+							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+							{{#if this.attributes.Name}}
+								{{this.attributes.Name}} (Confidence: {{this.attributes.MatchConfidence}}%)
+							{{else}}
+								Unrecognised Person
+							{{/if}}
+						</li>	
 					{{/each}}
+					</ul>
 				</div>
 			</div>
 		</div>

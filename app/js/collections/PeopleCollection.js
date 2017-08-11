@@ -3,11 +3,10 @@
  */
 define([
    'backbone',
-   'sha256',
    'hmacsha256',
    'cryptosha256',
    'js/models/PersonModel'
-], function (Backbone,SHA256,HMACSHA256,CryptoSHA256,PersonModel) {
+], function (Backbone,HMACSHA256,CryptoSHA256,PersonModel) {
     /*
      *PeopleCollection returns AWS Rekognition analysis results
      */
