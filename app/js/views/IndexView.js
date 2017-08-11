@@ -2,13 +2,14 @@
  *IndexView.js defines the index view (controller)
  */
 define([
+    'bootstrap',
     'jquery',
     'underscore',
     'backbone',
-    'handlebars',
+    'handlebars',   
     'js/collections/PeopleCollection',
     'text!templates/indextemplate.html',
-], function($, _, Backbone, Handlebars, PeopleCollection, indexTemplate) {
+], function(bs,$, _, Backbone, Handlebars, PeopleCollection, indexTemplate) {
     
     var IndexView = Backbone.View.extend({
 
@@ -22,8 +23,13 @@ define([
 
         imageBlob: null, //just the image data blob
 
+        imgWidth: null, //scaled image width
+
+        imgHeight: null, //scaled image height
+
         events: {
-            'change #file' : 'readFile' //file chosen
+            'change #file' : 'readFile', //file chosen
+            'click .celebrity' : 'showCelebrityInfo' //celebrity name clicked
         },
 
         /**
@@ -47,12 +53,17 @@ define([
             this.$el.html(this.compiledTemplate); // push template content to DOM element
 
             this.renderImage();
+
+            this.hideLoading(); //hide loading screen if visible;
         },
 
         /**
          * Image has been chosen from file chooser - handle it
          */
         readFile: function(e) {
+
+            this.showLoading();
+
             var file = e.target.files[0]; //selecting a single file
 
             // Read in the image file as a data URL.
@@ -96,19 +107,78 @@ define([
             var canvas = document.getElementById('image-canvas');
             var ctx = canvas.getContext('2d');
                 
-            img.onload = function() {
+            img.onload = $.proxy(function() {
                 var ratio = img.width / img.height;
-                var newWidth = img.width > canvas.width ? canvas.width : img.width;
-                var newHeight = newWidth / ratio;
-                if (newHeight > canvas.height) {
-                     newHeight = canvas.height;
-                     newWidth = newHeight * ratio;
+                this.imgWidth = img.width > canvas.width ? canvas.width : img.width;
+                this.imgHeight = this.imgWidth / ratio;
+                if (this.imgHeight > canvas.height) {
+                     this.imgHeight = canvas.height;
+                     this.imgWidth = this.imgHeight * ratio;
                  }
                 
-                ctx.drawImage(img,0,0, newWidth , newHeight);
-            }
+                ctx.drawImage(img,0,0, this.imgWidth , this.imgHeight);
 
-         }
+                $.each(this.people.models, $.proxy(function(index,person){
+
+                    if (person.get('Name') !== null) {
+                        this.drawImageBoundingBox(person.get('Face').BoundingBox, person.get('highlightColour'));
+                    } else {
+                        this.drawImageBoundingBox(person.get('BoundingBox'), person.get('highlightColour'));
+                    }
+                },this));
+                
+            },this);
+
+         },
+
+
+         /**
+          * Draw bounding box on image
+          */
+        drawImageBoundingBox: function(params, colour) {
+
+            var strokeColour = colour.substring(1);
+
+            var left = params.Left * this.imgWidth;
+            var top = params.Top * this.imgHeight;
+            var height = params.Height * this.imgHeight;
+            var width = params.Width * this.imgWidth;
+
+            var canvas = document.getElementById('image-canvas');
+            var ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.rect(left, top, width, height);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = colour;
+            ctx.stroke();
+        },
+
+        /**
+         *  
+         */
+        showCelebrityInfo: function(e) {         
+            var celebrity = this.people.findWhere({Id:$(e.currentTarget).data('id')});
+            $('[data-id=' + celebrity.get('Id') + ']').append('<a href=' + celebrity.get('Urls')[0] + '>' + celebrity.get('Urls')[0] + '</a>');
+        },
+
+
+        /**
+         *  show loading screen
+         */
+        showLoading: function() {
+            if (!$('#loadingDiv').is(':visible')) {
+                $('#loadingDiv').show();
+            }
+        },
+
+        /**
+         *  hide loading screen
+         */
+        hideLoading: function() {
+            if ($('#loadingDiv').is(':visible')) {
+                $('#loadingDiv').hide();
+            } 
+        }
 
     });
     
