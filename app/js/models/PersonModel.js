@@ -7,29 +7,25 @@ define([
    'cryptosha256',
    'randomcolor'
 ], function (Backbone,HMACSHA256,CryptoSHA256,RandomColor) {
+
     var Person = Backbone.Model.extend({
-    	
-        url: 'https://rekognition.us-west-2.amazonaws.com', //API endpoint
 
-        secretAccessKey: Config.AWS.SecretAccessKey,
+      //set default attributes for a person
+      defaults: {
+        Id: null,
+        MatchConfidence: null,
+        Name: null,
+        Url: null,
+        highlightColour: null,
+      },
 
-        credential: Config.AWS.Credential,
-
-        defaults: {
-    		Id: null,
-			MatchConfidence: null,
-			Name: null,
-            Url: null,
-            highlightColour: null,
-		},
-
-        initialize: function() {
-            this.set({highlightColour: RandomColor()});
-        },
+      initialize: function() {
+        this.set({highlightColour: RandomColor()}); //set a random highlight colour for instance of person
+      },
 
     });
     
-    return Person; //return require.js User object definition
+    return Person; //return require.js Person object definition
 });
 
 

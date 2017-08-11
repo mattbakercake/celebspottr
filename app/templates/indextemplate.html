@@ -21,7 +21,7 @@
 				<div class="panel-body">
 					<canvas id="image-canvas"></canvas>
 
-					<input type="file" id="file" name="file" accept=".jpg,.jpeg,.png"/>
+					<input type="file" id="file" name="file" accept=".jpg,.jpeg,.png" data-toggle="popover" title="Get Started" data-content="Choose a jpeg/png image containing celebrity faces" data-placement="top"/>
 				</div>
 			</div>
 		</div>
@@ -36,9 +36,10 @@
 					<ul class="list-group">
 					{{#each people}}
 						<li class="list-group-item {{#if this.attributes.Name}}celebrity{{/if}}" data-id="{{this.attributes.Id}}" style="background-color: {{this.attributes.highlightColour}}">
+							<input type="checkbox" data-id="{{this.cid}}" checked>
 							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 							{{#if this.attributes.Name}}
-								{{this.attributes.Name}} (Confidence: {{this.attributes.MatchConfidence}}%)
+								<a href="http://{{this.attributes.Urls}}" target="_blank">{{this.attributes.Name}}</a> (Confidence: {{this.attributes.MatchConfidence}}%)
 							{{else}}
 								Unrecognised Person
 							{{/if}}

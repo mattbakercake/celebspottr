@@ -23,14 +23,19 @@ define([
 
         imageBlob: null, //just the image data blob
 
-        imgWidth: null, //scaled image width
+        imgWidth: null, //scaled image width (needed for boundingbox creation)
 
-        imgHeight: null, //scaled image height
+        imgHeight: null, //scaled image height (needed for boundingbox creation)
+
+        scaledCanvasImg: null, //canvas image before bounding boxes
+
 
         events: {
+            'click input' : 'closePopover', //file button clicked
             'change #file' : 'readFile', //file chosen
-            'click .celebrity' : 'showCelebrityInfo' //celebrity name clicked
+            'click [type="checkbox"]' : 'redrawBoundingBoxes' //checkbox changed
         },
+
 
         /**
          * Constructor
@@ -38,15 +43,17 @@ define([
         initialize: function() {
             this.render();
         },
-        
+  
+
         /**
          * Display view template
          */
         render: function() {
 
-            var context = {
+            var context = { //variables to send to template
                 people: this.people.models
             }
+
             var template = Handlebars.compile(indexTemplate) //compile html template
             this.compiledTemplate = template(context) //add variables to view template
 
@@ -55,7 +62,10 @@ define([
             this.renderImage();
 
             this.hideLoading(); //hide loading screen if visible;
+
+            $('#file').popover('show');
         },
+
 
         /**
          * Image has been chosen from file chooser - handle it
@@ -79,15 +89,16 @@ define([
             },this);
         },
 
+
         /**
-         *  Get people in image
+         *  Get people in image from Rekognition API
          */
         analyseImage: function() {
 
             //photo analysis will create a collection of people
             this.people = new PeopleCollection();
 
-            //listen for collection update to re-render page
+            //listen for collection update after API call to re-render page
             this.listenTo(this.people, "update", this.render);
 
             //fetch collection (calls API)
@@ -96,17 +107,21 @@ define([
             });
         },
 
+
         /**
          * Draw selected image scaled on canvas
          */
          renderImage: function() {
 
+            //create an image object from the data
             var img = new Image();
             img.src = this.imageURI;
 
+            //initialise canvas element
             var canvas = document.getElementById('image-canvas');
             var ctx = canvas.getContext('2d');
-                
+            
+            //when image data loaded scale the image
             img.onload = $.proxy(function() {
                 var ratio = img.width / img.height;
                 this.imgWidth = img.width > canvas.width ? canvas.width : img.width;
@@ -116,15 +131,12 @@ define([
                      this.imgWidth = this.imgHeight * ratio;
                  }
                 
-                ctx.drawImage(img,0,0, this.imgWidth , this.imgHeight);
+                ctx.drawImage(img,0,0, this.imgWidth , this.imgHeight); //draw image to canvas
 
-                $.each(this.people.models, $.proxy(function(index,person){
+                this.scaledCanvasImg = ctx.getImageData(0,0,canvas.width,canvas.height); //save canvas image data to reset later
 
-                    if (person.get('Name') !== null) {
-                        this.drawImageBoundingBox(person.get('Face').BoundingBox, person.get('highlightColour'));
-                    } else {
-                        this.drawImageBoundingBox(person.get('BoundingBox'), person.get('highlightColour'));
-                    }
+                $.each(this.people.models, $.proxy(function(index,person){ //for each person draw bounding box around face
+                    this.drawImageBoundingBox(person);
                 },this));
                 
             },this);
@@ -132,12 +144,17 @@ define([
          },
 
 
-         /**
-          * Draw bounding box on image
-          */
-        drawImageBoundingBox: function(params, colour) {
+        /**
+        * Draw bounding box on image
+        */
+        drawImageBoundingBox: function(person) {
 
-            var strokeColour = colour.substring(1);
+            if (person.get('Name') !== null) {
+                var params = person.get('Face').BoundingBox; //celebrity
+            } else {
+                var params = person.get('BoundingBox'); //unrecognised
+            }
+            var colour = person.get('highlightColour')
 
             var left = params.Left * this.imgWidth;
             var top = params.Top * this.imgHeight;
@@ -154,11 +171,31 @@ define([
         },
 
         /**
-         *  
+         *  redraw bounding boxes on image (e.g. person de-selected)
          */
-        showCelebrityInfo: function(e) {         
-            var celebrity = this.people.findWhere({Id:$(e.currentTarget).data('id')});
-            $('[data-id=' + celebrity.get('Id') + ']').append('<a href=' + celebrity.get('Urls')[0] + '>' + celebrity.get('Urls')[0] + '</a>');
+        redrawBoundingBoxes: function() {
+
+            //reset canvas to clean image
+            var canvas = document.getElementById('image-canvas');
+            var ctx = canvas.getContext('2d');
+            ctx.putImageData(this.scaledCanvasImg,0,0);
+
+            //draw boudning box for each person who is selected
+            $.each($('[type="checkbox"]'), $.proxy(function(index,checkbox) {
+                if ($(checkbox).is(':checked')) {
+                    var person = this.people.get({cid:$(checkbox).data('id')});
+                    this.drawImageBoundingBox(person);
+                } 
+            },this));
+
+        },
+
+
+        /**
+         *  Close get started popover
+         */
+        closePopover: function() {
+            $('#file').popover('close')
         },
 
 
