@@ -1,5 +1,5 @@
 /**
- * PersonModel.js defines an person model
+ * PersonModel.js defines a person model
  */
 define([
    'backbone',

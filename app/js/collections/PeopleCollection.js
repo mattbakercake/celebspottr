@@ -1,5 +1,6 @@
 /*
- * PeopleCollection.js defines an example collection
+ * PeopleCollection.js defines collection of people
+ * pulled from AWS Rekognition image analysis
  */
 define([
    'backbone',
@@ -7,20 +8,17 @@ define([
    'cryptosha256',
    'js/models/PersonModel'
 ], function (Backbone,HMACSHA256,CryptoSHA256,PersonModel) {
-    /*
-     *PeopleCollection returns AWS Rekognition analysis results
-     */
+
     var PeopleCollection = Backbone.Collection.extend({
 
-        model: PersonModel,
+        model: PersonModel, //backbone model collection relates to
 
-        secretAccessKey: Config.AWS.SecretAccessKey,
+        secretAccessKey: Config.AWS.SecretAccessKey, //get AWS credentials
 
         credential: Config.AWS.Credential,
         
         url: 'https://rekognition.us-west-2.amazonaws.com', //API endpoint
-
-        oSync: Backbone.sync, //Backbone sync method
+        
 
         /**
          *  Override fetch method in collection so that we

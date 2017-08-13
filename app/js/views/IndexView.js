@@ -2,14 +2,13 @@
  *IndexView.js defines the index view (controller)
  */
 define([
-    'bootstrap',
     'jquery',
     'underscore',
     'backbone',
     'handlebars',   
     'js/collections/PeopleCollection',
     'text!templates/indextemplate.html',
-], function(bs,$, _, Backbone, Handlebars, PeopleCollection, indexTemplate) {
+], function($, _, Backbone, Handlebars, PeopleCollection, indexTemplate) {
     
     var IndexView = Backbone.View.extend({
 
@@ -43,7 +42,7 @@ define([
         initialize: function() {
             this.render();
 
-            this.listenToOnce(this,'renderFinished',function(){ //close intro popover when file selected
+            this.listenToOnce(this,'renderFinished',function(){ //show intro popover when page first loads
                 $('#file').popover('show');
             });
 
@@ -71,7 +70,7 @@ define([
 
             this.hideLoading(); //hide loading screen if visible
 
-            this.trigger('renderFinished')
+            this.trigger('renderFinished'); //fire event (shows popover)
 
         },
 
@@ -110,7 +109,7 @@ define([
             //listen for collection update after API call to re-render page
             this.listenTo(this.people, "fetchComplete", this.render);
 
-            //fetch collection (calls API)
+            //fetch collection (calls API to populate collection)
             this.people.fetch({
                 data: JSON.stringify({ Image : { Bytes: this.imageBlob }})
             });
