@@ -14,7 +14,7 @@ To get started you will need an AWS account with credentials allowing access to 
 * **jQuery** - the best known javascript library!
 * **Bootstrap** - Twitter's bootstrap framework js features
 * **crypto sha256 and hmac-256** - cryptographic library allowing creation of hashes for signing requests
-* **randomcolor ** - returns a random hex colour value
+* **randomcolor** - returns a random hex colour value
 
 ### Application Structure ###
 
