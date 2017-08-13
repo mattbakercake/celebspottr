@@ -5,7 +5,7 @@ Config = {};
 
 Config.AWS ={
 	
-	SecretAccessKey: 'DcPBX5MnyPWurDuqmZE/O9VmuUaVkYuNSEbqsZvb',
-    Credential: 'AKIAI2OXFXKEWXIMZZNA',
+	SecretAccessKey: **AWS SecretAccessKey**,
+    Credential: **AWS Credential**,
 
 };
