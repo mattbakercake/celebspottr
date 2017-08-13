@@ -13,7 +13,6 @@ require.config({
         text: 'js/vendor/text',
         handlebars: 'js/vendor/handlebars',
         router: 'js/router',
-        sha256: 'js/vendor/sha256',
         hmacsha256: 'js/vendor/hmac-sha256',
         cryptosha256: 'js/vendor/cryptosha256',
         randomcolor: 'js/vendor/randomcolor-min'
